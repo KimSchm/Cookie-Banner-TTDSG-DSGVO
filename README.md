@@ -63,7 +63,11 @@ The cookie banner system provides:
 	 ```
      The CSS will block pointer events for everything except the banner and overlay.
 
-## Configuration via `cookie.json`
+6. **GTM ID**
+
+	Replace `GTM-XXXXXXXX` in `cookie/cookie.json` with your actual Google Tag Manager ID
+
+## Configuration via `cookie.json` 
 
 The `cookie/cookie.json` file controls:
 - Language strings and descriptions for each category.
