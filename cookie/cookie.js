@@ -150,12 +150,8 @@ class TTDSGCookieManager {
             var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
             j.async = true;
             j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-            j.onload = function () {
-                console.log('GTM script loaded and executed');
-            };
             f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer',);
-        console.log('GTM loading initiated');
+        })(window, document, 'script', 'dataLayer', this.GTM_ID);
     }
 
     /**
@@ -163,8 +159,7 @@ class TTDSGCookieManager {
      * This prevents any tracking scripts from running.
      */
     removeGTM() {
-        window['ga-disable-GTM-T3X9LF5H'] = true;
-        console.log('GTM disabled');
+        window['ga-disable-' + this.GTM_ID] = true;
     }
 }
 
