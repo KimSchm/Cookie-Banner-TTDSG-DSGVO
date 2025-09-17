@@ -1,0 +1,107 @@
+{
+    "GTM_ID": "GTM-XXXXXXXX",
+    "type_description": [
+        {
+            "lang": "en",
+            "NEEDED": "Necessary Cookies",
+            "ANALYTICS": "Analytics Cookies",
+            "MARKETING": "Marketing Cookies",
+            "NEEDED_DESC": "These cookies are essential for the basic functionalities of the website",
+            "ANALYTICS_DESC": "These cookies help us understand how visitors interact with the website",
+            "MARKETING_DESC": "These cookies are used to track visitors across websites",
+            "provider": "Provider",
+            "data": "Data",
+            "data_transferred": "Data Transfer",
+            "example": "Examples",
+            "legal_basis": "Legal Basis",
+            "duration": "Duration",
+            "withdrawal": "Withdrawal",
+            "settings": "Cookie Settings",
+            "settings_aria": "Open cookie settings",
+            "accept_all": "Accept All",
+            "accept_all_aria": "Accept all cookies",
+            "decline_all": "Decline All",
+            "decline_all_aria": "Decline all cookies",
+            "save_selected": "Save Settings",
+            "save_selected_aria": "Save selected cookie settings",
+            "details": "Show Details",
+            "details_aria": "Show cookie details",
+            "title": "Cookie Settings",
+            "title_description": "We use cookies to enhance your experience. Manage your preferences below."
+        },
+        {
+            "lang": "ger",
+            "NEEDED": "Technisch notwendige Cookies",
+            "ANALYTICS": "Analyse-Cookies",
+            "MARKETING": "Marketing-Cookies",
+            "NEEDED_DESC": "Diese Cookies sind für die Grundfunktionen der Website erforderlich",
+            "ANALYTICS_DESC": "Diese Cookies helfen uns zu verstehen, wie Besucher mit der Website interagieren",
+            "MARKETING_DESC": "Diese Cookies werden verwendet, um Besucher über Websites hinweg zu verfolgen",
+            "provider": "Anbieter",
+            "data": "Daten",
+            "data_transferred": "Datenübertragung",
+            "example": "Beispiele",
+            "legal_basis": "Rechtsgrundlage",
+            "duration": "Speicherdauer",
+            "withdrawal": "Widerruf",
+            "settings": "Cookie-Einstellungen",
+            "settings_aria": "Cookie-Einstellungen öffnen",
+            "accept_all": "Alle akzeptieren",
+            "accept_all_aria": "Alle Cookies akzeptieren",
+            "decline_all": "Alle ablehnen",
+            "decline_all_aria": "Alle Cookies ablehnen",
+            "save_selected": "Einstellungen speichern",
+            "save_selected_aria": "Ausgewählte Cookie-Einstellungen speichern",
+            "details": "Details anzeigen",
+            "details_aria": "Cookie-Details anzeigen",
+            "title": " Cookie-Einstellungen",
+            "title_description": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Verwalten Sie unten Ihre Präferenzen."
+        }
+    ],
+    "descriptions": {
+        "en": [
+            {
+                "NEEDED": [
+                    {
+                        "provider": "This Website",
+                        "example": "Stores the user's session ID to enable navigation on the website.",
+                        "legal_basis": "Legitimate Interest (Art. 6(1)(f) GDPR)",
+                        "duration": "1 year"
+                    }
+                ],
+                "ANALYTICS": [
+                    {
+                        "provider": "Google LLC",
+                        "data": "Anonymous usage statistics, device/browser information, location data (country/region)",
+                        "data_transferred": "USA (EU-US Data Privacy Framework)",
+                        "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
+                        "duration": "14 months",
+                        "withdrawal": "Via settings in the banner or Google Analytics Opt-out"
+                    }
+                ]
+            }
+        ],
+        "ger": [
+            {
+                "NEEDED": [
+                    {
+                        "provider": "Diese Website",
+                        "example": "Speichert die Sitzungs-ID des Benutzers, um die Navigation auf der Website zu ermöglichen.",
+                        "legal_basis": "Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO)",
+                        "duration": "1 Jahr"
+                    }
+                ],
+                "ANALYTICS": [
+                    {
+                        "provider": "Google LLC",
+                        "data": "Anonyme Nutzungsstatistiken, Geräte-/Browserinformationen, Standortdaten (Land/Region)",
+                        "data_transferred": "USA (EU-US Data Privacy Framework)",
+                        "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+                        "duration": "14 Monate",
+                        "withdrawal": "Über die Einstellungen im Banner oder Google Analytics Opt-out"
+                    }
+                ]
+            }
+        ]
+    }
+}

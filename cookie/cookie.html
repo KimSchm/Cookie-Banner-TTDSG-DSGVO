@@ -1,0 +1,57 @@
+<div id="cookie-block-overlay"></div>
+<div id="cookieBanner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title"
+    aria-describedby="cookie-desc">
+    <div class="cookie-banner-content">
+        <h2 id="cookie-title"></h2>
+        <p id="cookie-desc"></p>
+
+        <!-- Cookie categories -->
+        <div class="cookie-categories">
+            <!-- Technical Cookies -->
+            <div class="cookie-category" id="necessary-category">
+                <div class="category-header" data-category="necessary">
+                    <h3 class="category-title" id="necessary-title"></h3>
+                    <div class="category-toggle active disabled"
+                        aria-label="Technisch notwendige Cookies - immer aktiv"></div>
+                </div>
+                <div class="category-details" id="necessary-details"></div>
+            </div>
+
+            <!-- Analytics Cookies -->
+            <div class="cookie-category" id="analytics-category">
+                <div class="category-header" data-category="analytics">
+                    <h3 class="category-title" id="analytics-title"></h3>
+                    <div class="category-toggle" id="analytics-toggle" role="switch" aria-checked="false"
+                        aria-label="Analyse-Cookies aktivieren/deaktivieren" tabindex="0"></div>
+                </div>
+                <div class="category-details" id="analytics-details"></div>
+            </div>
+
+            <!-- Marketing Cookies -->
+            <div class="cookie-category" id="marketing-category">
+                <div class="category-header" data-category="marketing">
+                    <h3 class="category-title" id="marketing-title"></h3>
+                    <div class="category-toggle" id="marketing-toggle" role="switch" aria-checked="false"
+                        aria-label="Marketing-Cookies aktivieren/deaktivieren" tabindex="0"></div>
+                </div>
+                <div class="category-details" id="marketing-details"></div>
+            </div>
+        </div>
+
+        <!-- Banner Buttons -->
+        <div class="cookie-buttons">
+            <button class="cookie-btn btn-accept-all" onclick="acceptAllCookies()">
+            </button>
+            <button class="cookie-btn btn-reject-all" onclick="rejectAllCookies()">
+            </button>
+            <button class="cookie-btn btn-accept-selected" onclick="acceptSelectedCookies()">
+            </button>
+            <button class="cookie-btn btn-detail-settings" onclick="showDetailSettings()">
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cookie Settings Link -->
+<a href="#" class="cookie-settings-link" onclick="showCookieBanner(); return false;">
+</a>
