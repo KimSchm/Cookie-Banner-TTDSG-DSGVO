@@ -1,107 +1,319 @@
 {
-    "GTM_ID": "GTM-XXXXXXXX",
-    "type_description": [
-        {
-            "lang": "en",
-            "NEEDED": "Necessary Cookies",
-            "ANALYTICS": "Analytics Cookies",
-            "MARKETING": "Marketing Cookies",
-            "NEEDED_DESC": "These cookies are essential for the basic functionalities of the website",
-            "ANALYTICS_DESC": "These cookies help us understand how visitors interact with the website",
-            "MARKETING_DESC": "These cookies are used to track visitors across websites",
-            "provider": "Provider",
-            "data": "Data",
-            "data_transferred": "Data Transfer",
-            "example": "Examples",
-            "legal_basis": "Legal Basis",
-            "duration": "Duration",
-            "withdrawal": "Withdrawal",
-            "settings": "Cookie Settings",
-            "settings_aria": "Open cookie settings",
-            "accept_all": "Accept All",
-            "accept_all_aria": "Accept all cookies",
-            "decline_all": "Decline All",
-            "decline_all_aria": "Decline all cookies",
-            "save_selected": "Save Settings",
-            "save_selected_aria": "Save selected cookie settings",
-            "details": "Show Details",
-            "details_aria": "Show cookie details",
-            "title": "Cookie Settings",
-            "title_description": "We use cookies to enhance your experience. Manage your preferences below."
-        },
-        {
-            "lang": "ger",
-            "NEEDED": "Technisch notwendige Cookies",
-            "ANALYTICS": "Analyse-Cookies",
-            "MARKETING": "Marketing-Cookies",
-            "NEEDED_DESC": "Diese Cookies sind für die Grundfunktionen der Website erforderlich",
-            "ANALYTICS_DESC": "Diese Cookies helfen uns zu verstehen, wie Besucher mit der Website interagieren",
-            "MARKETING_DESC": "Diese Cookies werden verwendet, um Besucher über Websites hinweg zu verfolgen",
-            "provider": "Anbieter",
-            "data": "Daten",
-            "data_transferred": "Datenübertragung",
-            "example": "Beispiele",
-            "legal_basis": "Rechtsgrundlage",
-            "duration": "Speicherdauer",
-            "withdrawal": "Widerruf",
-            "settings": "Cookie-Einstellungen",
-            "settings_aria": "Cookie-Einstellungen öffnen",
-            "accept_all": "Alle akzeptieren",
-            "accept_all_aria": "Alle Cookies akzeptieren",
-            "decline_all": "Alle ablehnen",
-            "decline_all_aria": "Alle Cookies ablehnen",
-            "save_selected": "Einstellungen speichern",
-            "save_selected_aria": "Ausgewählte Cookie-Einstellungen speichern",
-            "details": "Details anzeigen",
-            "details_aria": "Cookie-Details anzeigen",
-            "title": " Cookie-Einstellungen",
-            "title_description": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Verwalten Sie unten Ihre Präferenzen."
-        }
-    ],
-    "descriptions": {
-        "en": [
-            {
-                "NEEDED": [
-                    {
-                        "provider": "This Website",
-                        "example": "Stores the user's session ID to enable navigation on the website.",
-                        "legal_basis": "Legitimate Interest (Art. 6(1)(f) GDPR)",
-                        "duration": "1 year"
-                    }
-                ],
-                "ANALYTICS": [
-                    {
-                        "provider": "Google LLC",
-                        "data": "Anonymous usage statistics, device/browser information, location data (country/region)",
-                        "data_transferred": "USA (EU-US Data Privacy Framework)",
-                        "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
-                        "duration": "14 months",
-                        "withdrawal": "Via settings in the banner or Google Analytics Opt-out"
-                    }
-                ]
-            }
-        ],
-        "ger": [
-            {
-                "NEEDED": [
-                    {
-                        "provider": "Diese Website",
-                        "example": "Speichert die Sitzungs-ID des Benutzers, um die Navigation auf der Website zu ermöglichen.",
-                        "legal_basis": "Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO)",
-                        "duration": "1 Jahr"
-                    }
-                ],
-                "ANALYTICS": [
-                    {
-                        "provider": "Google LLC",
-                        "data": "Anonyme Nutzungsstatistiken, Geräte-/Browserinformationen, Standortdaten (Land/Region)",
-                        "data_transferred": "USA (EU-US Data Privacy Framework)",
-                        "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
-                        "duration": "14 Monate",
-                        "withdrawal": "Über die Einstellungen im Banner oder Google Analytics Opt-out"
-                    }
-                ]
-            }
-        ]
+  "GTM_ID": "GTM-XXXXXXXX",
+  "consent_version": "1.0",
+  "privacy_policy_url": "/privacy-policy",
+  "contact_dpo": "privacy@yourcompany.com",
+  
+  "type_description": [
+    {
+      "lang": "en",
+      "NEEDED": "Necessary Cookies",
+      "FUNCTIONAL": "Functional Cookies", 
+      "ANALYTICS": "Analytics Cookies",
+      "MARKETING": "Marketing Cookies",
+      "SOCIAL_MEDIA": "Social Media Cookies",
+      
+      "NEEDED_DESC": "These cookies are essential for the basic functionalities of the website and cannot be disabled",
+      "FUNCTIONAL_DESC": "These cookies enable enhanced functionality and personalization, such as videos and live chats",
+      "ANALYTICS_DESC": "These cookies help us understand how visitors interact with the website by collecting and reporting information anonymously", 
+      "MARKETING_DESC": "These cookies are used to track visitors across websites to display relevant and engaging advertisements",
+      "SOCIAL_MEDIA_DESC": "These cookies are set by social media services and allow sharing of content",
+      
+      "provider": "Provider",
+      "purpose": "Purpose",
+      "cookie_name": "Cookie Name",
+      "data": "Data Collected",
+      "data_transferred": "Data Transfer",
+      "example": "Examples", 
+      "legal_basis": "Legal Basis",
+      "duration": "Storage Duration",
+      "withdrawal": "How to Withdraw",
+      "third_parties": "Third Parties",
+      
+      "settings": "Cookie Settings",
+      "settings_aria": "Open cookie settings to manage your preferences",
+      "accept_all": "Accept All",
+      "accept_all_aria": "Accept all cookies and tracking",
+      "decline_all": "Decline All", 
+      "decline_all_aria": "Decline all non-essential cookies",
+      "save_selected": "Save Selection",
+      "save_selected_aria": "Save your selected cookie preferences",
+      "details": "Show Details",
+      "details_aria": "Show detailed information about each cookie category",
+      "withdraw_consent": "Withdraw Consent",
+      "withdraw_consent_aria": "Withdraw your previously given consent",
+      "change_settings": "Change Settings",
+      "change_settings_aria": "Modify your cookie preferences",
+      
+      "title": "Cookie Settings",
+      "title_description": "We use cookies to enhance your experience and analyze our traffic. Please choose your preferences below.",
+      "detailed_info": "Detailed Information",
+      "your_rights": "Your Rights",
+      "contact_info": "Contact Information",
+      
+      "rights_text": "Under GDPR, you have the right to access, rectify, erase, restrict processing, object to processing, and data portability. You can withdraw consent at any time.",
+      "contact_text": "For privacy-related questions, contact our Data Protection Officer at privacy@yourcompany.com",
+      
+      "withdrawal_title": "Withdraw Cookie Consent",
+      "withdrawal_description": "You can withdraw your consent for any cookie categories. This will stop future data collection but won't delete already collected data.",
+      "withdrawal_confirm": "Withdraw Selected",
+      "withdrawal_cancel": "Cancel"
+    },
+    {
+      "lang": "ger", 
+      "NEEDED": "Technisch notwendige Cookies",
+      "FUNCTIONAL": "Funktionale Cookies",
+      "ANALYTICS": "Analyse-Cookies", 
+      "MARKETING": "Marketing-Cookies",
+      "SOCIAL_MEDIA": "Social Media Cookies",
+      
+      "NEEDED_DESC": "Diese Cookies sind für die Grundfunktionen der Website erforderlich und können nicht deaktiviert werden",
+      "FUNCTIONAL_DESC": "Diese Cookies ermöglichen erweiterte Funktionen und Personalisierung wie Videos und Live-Chats",
+      "ANALYTICS_DESC": "Diese Cookies helfen uns zu verstehen, wie Besucher mit der Website interagieren, indem sie Informationen anonym sammeln und melden",
+      "MARKETING_DESC": "Diese Cookies werden verwendet, um Besucher über Websites hinweg zu verfolgen und relevante Werbung anzuzeigen", 
+      "SOCIAL_MEDIA_DESC": "Diese Cookies werden von Social Media-Diensten gesetzt und ermöglichen das Teilen von Inhalten",
+      
+      "provider": "Anbieter",
+      "purpose": "Zweck", 
+      "cookie_name": "Cookie-Name",
+      "data": "Gesammelte Daten",
+      "data_transferred": "Datenübertragung",
+      "example": "Beispiele",
+      "legal_basis": "Rechtsgrundlage", 
+      "duration": "Speicherdauer",
+      "withdrawal": "Widerruf", 
+      "third_parties": "Dritte",
+      
+      "settings": "Cookie-Einstellungen",
+      "settings_aria": "Cookie-Einstellungen öffnen, um Ihre Präferenzen zu verwalten",
+      "accept_all": "Alle akzeptieren",
+      "accept_all_aria": "Alle Cookies und Tracking akzeptieren", 
+      "decline_all": "Alle ablehnen",
+      "decline_all_aria": "Alle nicht-essentiellen Cookies ablehnen",
+      "save_selected": "Auswahl speichern", 
+      "save_selected_aria": "Ihre gewählten Cookie-Präferenzen speichern",
+      "details": "Details anzeigen",
+      "details_aria": "Detaillierte Informationen zu jeder Cookie-Kategorie anzeigen",
+      "withdraw_consent": "Einwilligung widerrufen",
+      "withdraw_consent_aria": "Ihre zuvor erteilte Einwilligung widerrufen",
+      "change_settings": "Einstellungen ändern", 
+      "change_settings_aria": "Ihre Cookie-Präferenzen ändern",
+      
+      "title": "Cookie-Einstellungen",
+      "title_description": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern und unseren Traffic zu analysieren. Bitte wählen Sie unten Ihre Präferenzen.",
+      "detailed_info": "Detaillierte Informationen",
+      "your_rights": "Ihre Rechte", 
+      "contact_info": "Kontaktinformationen",
+      
+      "rights_text": "Nach DSGVO haben Sie das Recht auf Zugang, Berichtigung, Löschung, Einschränkung der Verarbeitung, Widerspruch gegen die Verarbeitung und Datenübertragbarkeit. Sie können die Einwilligung jederzeit widerrufen.",
+      "contact_text": "Bei datenschutzrechtlichen Fragen wenden Sie sich an unseren Datenschutzbeauftragten unter privacy@yourcompany.com",
+      
+      "withdrawal_title": "Cookie-Einwilligung widerrufen",
+      "withdrawal_description": "Sie können Ihre Einwilligung für beliebige Cookie-Kategorien widerrufen. Dies stoppt die zukünftige Datensammlung, löscht aber bereits gesammelte Daten nicht.",
+      "withdrawal_confirm": "Auswahl widerrufen",
+      "withdrawal_cancel": "Abbrechen"
     }
+  ],
+  
+  "descriptions": {
+    "en": [
+      {
+        "NEEDED": [
+          {
+            "provider": "This Website",
+            "cookie_name": "cookieConsent", 
+            "purpose": "Stores the user's cookie consent preferences to remember their choices across sessions",
+            "legal_basis": "Legitimate Interest (Art. 6(1)(f) GDPR) - Essential for website functionality",
+            "duration": "1 year",
+            "data_transferred": "None - stored locally in browser",
+            "third_parties": "None"
+          },
+          {
+            "provider": "This Website", 
+            "cookie_name": "sessionId",
+            "purpose": "Maintains user session for security and functionality during website navigation",
+            "legal_basis": "Legitimate Interest (Art. 6(1)(f) GDPR) - Essential for website security",
+            "duration": "Session only",
+            "data_transferred": "None - stored locally in browser", 
+            "third_parties": "None"
+          }
+        ],
+        
+        "FUNCTIONAL": [
+          {
+            "provider": "This Website",
+            "cookie_name": "userPreferences",
+            "purpose": "Stores user interface preferences such as language selection and display settings",
+            "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
+            "duration": "6 months", 
+            "data_transferred": "None - stored locally in browser",
+            "third_parties": "None",
+            "withdrawal": "Via cookie settings or by clearing browser cookies"
+          }
+        ],
+        
+        "ANALYTICS": [
+          {
+            "provider": "Google LLC",
+            "cookie_name": "_ga, _ga_*, _gid, _gat",
+            "purpose": "Google Analytics - Measures website usage, user behavior, and performance to improve user experience",
+            "data": "Anonymized IP address, browser information, pages visited, time spent on site, referring website, device type", 
+            "data_transferred": "USA (EU-US Data Privacy Framework - Adequacy Decision 2023)",
+            "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
+            "duration": "_ga: 2 years, _gid: 24 hours, _gat: 1 minute",
+            "third_parties": "Google Analytics, Google Ads (if linked to Analytics)",
+            "withdrawal": "Via cookie settings, Google Analytics Opt-out Browser Add-on, or ads settings"
+          },
+          {
+            "provider": "Google LLC (GTM)",
+            "cookie_name": "Various GTM cookies",
+            "purpose": "Google Tag Manager - Manages and loads marketing and analytics tags based on user interactions",
+            "data": "Page views, clicks, form submissions, scroll depth, custom events",
+            "data_transferred": "USA (EU-US Data Privacy Framework - Adequacy Decision 2023)", 
+            "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
+            "duration": "Varies by tag - typically 1-24 months",
+            "third_parties": "Connected services via GTM (Analytics, Ads, etc.)",
+            "withdrawal": "Via cookie settings or by disabling individual tags"
+          }
+        ],
+        
+        "MARKETING": [
+          {
+            "provider": "Google LLC",
+            "cookie_name": "_gcl_au, _fbp, conversion tracking cookies",
+            "purpose": "Conversion tracking and remarketing - Tracks effectiveness of advertising campaigns and enables personalized ads",
+            "data": "Ad interactions, conversion events, device identifiers, browsing behavior across advertiser networks",
+            "data_transferred": "USA (EU-US Data Privacy Framework - Adequacy Decision 2023)",
+            "legal_basis": "Consent (Art. 6(1)(a) GDPR)", 
+            "duration": "90 days to 2 years depending on cookie type",
+            "third_parties": "Google Ads, Google Marketing Platform, advertising partners",
+            "withdrawal": "Via cookie settings, Google Ads Settings, or Your Online Choices"
+          }
+        ],
+        
+        "SOCIAL_MEDIA": [
+          {
+            "provider": "Various Social Networks",
+            "cookie_name": "Platform-specific cookies (e.g., _fbp, __twitter_sess)",
+            "purpose": "Social media integration - Enables sharing content and provides social login functionality", 
+            "data": "Social interactions, shared content, profile information (if logged in)",
+            "data_transferred": "Various countries depending on platform",
+            "legal_basis": "Consent (Art. 6(1)(a) GDPR)",
+            "duration": "Varies by platform - typically 1-24 months",
+            "third_parties": "Social media platforms and their advertising partners",
+            "withdrawal": "Via cookie settings or directly through social media platform settings"
+          }
+        ]
+      }
+    ],
+    
+    "ger": [
+      {
+        "NEEDED": [
+          {
+            "provider": "Diese Website", 
+            "cookie_name": "cookieConsent",
+            "purpose": "Speichert die Cookie-Einwilligungspräferenzen des Nutzers, um seine Entscheidungen über Sitzungen hinweg zu merken",
+            "legal_basis": "Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) - Wesentlich für Website-Funktionalität",
+            "duration": "1 Jahr",
+            "data_transferred": "Keine - lokal im Browser gespeichert",
+            "third_parties": "Keine"
+          },
+          {
+            "provider": "Diese Website",
+            "cookie_name": "sessionId", 
+            "purpose": "Hält die Nutzersitzung für Sicherheit und Funktionalität während der Website-Navigation aufrecht",
+            "legal_basis": "Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO) - Wesentlich für Website-Sicherheit", 
+            "duration": "Nur Sitzung",
+            "data_transferred": "Keine - lokal im Browser gespeichert",
+            "third_parties": "Keine"
+          }
+        ],
+        
+        "FUNCTIONAL": [
+          {
+            "provider": "Diese Website",
+            "cookie_name": "userPreferences", 
+            "purpose": "Speichert Benutzeroberflächen-Präferenzen wie Sprachauswahl und Anzeigeeinstellungen",
+            "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+            "duration": "6 Monate",
+            "data_transferred": "Keine - lokal im Browser gespeichert",
+            "third_parties": "Keine", 
+            "withdrawal": "Über Cookie-Einstellungen oder durch Löschen der Browser-Cookies"
+          }
+        ],
+        
+        "ANALYTICS": [
+          {
+            "provider": "Google LLC",
+            "cookie_name": "_ga, _ga_*, _gid, _gat",
+            "purpose": "Google Analytics - Misst Website-Nutzung, Nutzerverhalten und Leistung zur Verbesserung der Nutzererfahrung", 
+            "data": "Anonymisierte IP-Adresse, Browser-Informationen, besuchte Seiten, Verweildauer, verweisende Website, Gerätetyp",
+            "data_transferred": "USA (EU-US Data Privacy Framework - Angemessenheitsbeschluss 2023)",
+            "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+            "duration": "_ga: 2 Jahre, _gid: 24 Stunden, _gat: 1 Minute", 
+            "third_parties": "Google Analytics, Google Ads (falls mit Analytics verknüpft)",
+            "withdrawal": "Über Cookie-Einstellungen, Google Analytics Opt-out Browser-Add-on oder Anzeigeneinstellungen"
+          },
+          {
+            "provider": "Google LLC (GTM)",
+            "cookie_name": "Verschiedene GTM-Cookies",
+            "purpose": "Google Tag Manager - Verwaltet und lädt Marketing- und Analytics-Tags basierend auf Nutzerinteraktionen", 
+            "data": "Seitenaufrufe, Klicks, Formularübermittlungen, Scroll-Tiefe, benutzerdefinierte Ereignisse",
+            "data_transferred": "USA (EU-US Data Privacy Framework - Angemessenheitsbeschluss 2023)",
+            "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+            "duration": "Variiert je nach Tag - typischerweise 1-24 Monate",
+            "third_parties": "Verbundene Dienste über GTM (Analytics, Ads, etc.)", 
+            "withdrawal": "Über Cookie-Einstellungen oder durch Deaktivierung einzelner Tags"
+          }
+        ],
+        
+        "MARKETING": [
+          {
+            "provider": "Google LLC",
+            "cookie_name": "_gcl_au, _fbp, Conversion-Tracking-Cookies", 
+            "purpose": "Conversion-Tracking und Remarketing - Verfolgt die Wirksamkeit von Werbekampagnen und ermöglicht personalisierte Anzeigen",
+            "data": "Anzeigen-Interaktionen, Conversion-Ereignisse, Gerätekennungen, Browsing-Verhalten über Werbenetzwerke",
+            "data_transferred": "USA (EU-US Data Privacy Framework - Angemessenheitsbeschluss 2023)",
+            "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+            "duration": "90 Tage bis 2 Jahre je nach Cookie-Typ", 
+            "third_parties": "Google Ads, Google Marketing Platform, Werbepartner",
+            "withdrawal": "Über Cookie-Einstellungen, Google Anzeigeneinstellungen oder Your Online Choices"
+          }
+        ],
+        
+        "SOCIAL_MEDIA": [
+          {
+            "provider": "Verschiedene soziale Netzwerke",
+            "cookie_name": "Plattform-spezifische Cookies (z.B. _fbp, __twitter_sess)",
+            "purpose": "Social Media Integration - Ermöglicht das Teilen von Inhalten und bietet Social Login-Funktionalität", 
+            "data": "Soziale Interaktionen, geteilte Inhalte, Profilinformationen (falls angemeldet)",
+            "data_transferred": "Verschiedene Länder je nach Plattform", 
+            "legal_basis": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+            "duration": "Variiert je nach Plattform - typischerweise 1-24 Monate",
+            "third_parties": "Social Media-Plattformen und deren Werbepartner",
+            "withdrawal": "Über Cookie-Einstellungen oder direkt über die Einstellungen der Social Media-Plattform"
+          }
+        ]
+      }
+    ]
+  },
+  
+  "legal_requirements": {
+    "ttdsg_compliance": true,
+    "gdpr_compliance": true,
+    "consent_documentation_required": true,
+    "withdrawal_mechanism_required": true, 
+    "data_transfer_documentation": true,
+    "accessibility_required": true
+  },
+  
+  "technical_settings": {
+    "consent_expiry_months": 12,
+    "show_functional_category": true,
+    "show_social_media_category": true, 
+    "require_explicit_consent": true,
+    "enable_withdrawal_mechanism": true,
+    "log_consent_events": true
+  }
 }

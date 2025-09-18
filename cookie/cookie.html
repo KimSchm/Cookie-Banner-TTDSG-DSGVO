@@ -1,57 +1,231 @@
-<div id="cookie-block-overlay"></div>
-<div id="cookieBanner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title"
-    aria-describedby="cookie-desc">
+<div id="cookieBanner" class="cookie-banner hidden" role="dialog" aria-labelledby="cookie-title"
+    aria-describedby="cookie-desc" aria-modal="true" tabindex="-1">
     <div class="cookie-banner-content">
-        <h2 id="cookie-title"></h2>
-        <p id="cookie-desc"></p>
 
-        <!-- Cookie categories -->
-        <div class="cookie-categories">
-            <!-- Technical Cookies -->
+        <!-- Main Banner Content -->
+        <h2 id="cookie-title">Cookie Settings</h2>
+        <p id="cookie-desc">We use cookies to enhance your experience. Manage your preferences below.</p>
+
+        <!-- Quick Action Buttons (Always Visible) -->
+        <div class="cookie-buttons">
+            <button type="button" class="cookie-btn btn-accept-all" onclick="acceptAllCookies()"
+                aria-describedby="cookie-desc">
+                Accept All
+            </button>
+            <button type="button" class="cookie-btn btn-reject-all" onclick="rejectAllCookies()"
+                aria-describedby="cookie-desc">
+                Decline All
+            </button>
+            <button type="button" class="cookie-btn btn-detail-settings" onclick="showDetailSettings()"
+                aria-expanded="false">
+                Show Details
+            </button>
+            <button type="button" class="cookie-btn btn-accept-selected" onclick="acceptSelectedCookies()">
+                Save Selection
+            </button>
+        </div>
+
+        <!-- Detailed Cookie Categories -->
+        <div class="cookie-categories" role="group" aria-label="Cookie categories">
+
+            <!-- Necessary Cookies -->
             <div class="cookie-category" id="necessary-category">
-                <div class="category-header" data-category="necessary">
-                    <h3 class="category-title" id="necessary-title"></h3>
-                    <div class="category-toggle active disabled"
-                        aria-label="Technisch notwendige Cookies - immer aktiv"></div>
+                <button type="button" class="category-header" data-category="necessary" aria-expanded="false"
+                    aria-controls="necessary-details" role="button">
+                    <h3 class="category-title" id="necessary-title">Necessary Cookies</h3>
+                    <div class="category-toggle disabled" id="necessary-toggle" role="switch" aria-checked="true"
+                        aria-labelledby="necessary-title" aria-describedby="necessary-description" tabindex="-1">
+                        <span class="sr-only">Always enabled</span>
+                    </div>
+                </button>
+                <div class="category-details" id="necessary-details" aria-labelledby="necessary-title">
+                    <p id="necessary-description">These cookies are essential for basic website functionality and cannot
+                        be disabled.</p>
+                    <!-- Content populated dynamically -->
                 </div>
-                <div class="category-details" id="necessary-details"></div>
+            </div>
+
+            <!-- Functional Cookies -->
+            <div class="cookie-category" id="functional-category">
+                <button type="button" class="category-header" data-category="functional" aria-expanded="false"
+                    aria-controls="functional-details" role="button">
+                    <h3 class="category-title" id="functional-title">Functional Cookies</h3>
+                    <div class="category-toggle" id="functional-toggle" role="switch" aria-checked="false"
+                        aria-labelledby="functional-title" aria-describedby="functional-description" tabindex="0">
+                        <span class="sr-only">Toggle functional cookies</span>
+                    </div>
+                </button>
+                <div class="category-details" id="functional-details" aria-labelledby="functional-title">
+                    <p id="functional-description">These cookies enhance website functionality and personalization.</p>
+                    <!-- Content populated dynamically -->
+                </div>
             </div>
 
             <!-- Analytics Cookies -->
             <div class="cookie-category" id="analytics-category">
-                <div class="category-header" data-category="analytics">
-                    <h3 class="category-title" id="analytics-title"></h3>
+                <button type="button" class="category-header" data-category="analytics" aria-expanded="false"
+                    aria-controls="analytics-details" role="button">
+                    <h3 class="category-title" id="analytics-title">Analytics Cookies</h3>
                     <div class="category-toggle" id="analytics-toggle" role="switch" aria-checked="false"
-                        aria-label="Analyse-Cookies aktivieren/deaktivieren" tabindex="0"></div>
+                        aria-labelledby="analytics-title" aria-describedby="analytics-description" tabindex="0">
+                        <span class="sr-only">Toggle analytics cookies</span>
+                    </div>
+                </button>
+                <div class="category-details" id="analytics-details" aria-labelledby="analytics-title">
+                    <p id="analytics-description">These cookies help us understand how visitors interact with our
+                        website.</p>
+                    <!-- Content populated dynamically -->
                 </div>
-                <div class="category-details" id="analytics-details"></div>
             </div>
 
             <!-- Marketing Cookies -->
             <div class="cookie-category" id="marketing-category">
-                <div class="category-header" data-category="marketing">
-                    <h3 class="category-title" id="marketing-title"></h3>
+                <button type="button" class="category-header" data-category="marketing" aria-expanded="false"
+                    aria-controls="marketing-details" role="button">
+                    <h3 class="category-title" id="marketing-title">Marketing Cookies</h3>
                     <div class="category-toggle" id="marketing-toggle" role="switch" aria-checked="false"
-                        aria-label="Marketing-Cookies aktivieren/deaktivieren" tabindex="0"></div>
+                        aria-labelledby="marketing-title" aria-describedby="marketing-description" tabindex="0">
+                        <span class="sr-only">Toggle marketing cookies</span>
+                    </div>
+                </button>
+                <div class="category-details" id="marketing-details" aria-labelledby="marketing-title">
+                    <p id="marketing-description">These cookies are used for advertising and personalized content.</p>
+                    <!-- Content populated dynamically -->
                 </div>
-                <div class="category-details" id="marketing-details"></div>
+            </div>
+
+            <!-- Social Media Cookies -->
+            <div class="cookie-category" id="social_media-category">
+                <button type="button" class="category-header" data-category="social_media" aria-expanded="false"
+                    aria-controls="social_media-details" role="button">
+                    <h3 class="category-title" id="social_media-title">Social Media Cookies</h3>
+                    <div class="category-toggle" id="social_media-toggle" role="switch" aria-checked="false"
+                        aria-labelledby="social_media-title" aria-describedby="social_media-description" tabindex="0">
+                        <span class="sr-only">Toggle social media cookies</span>
+                    </div>
+                </button>
+                <div class="category-details" id="social_media-details" aria-labelledby="social_media-title">
+                    <p id="social_media-description">These cookies enable social media features and content sharing.</p>
+                    <!-- Content populated dynamically -->
+                </div>
             </div>
         </div>
 
-        <!-- Banner Buttons -->
-        <div class="cookie-buttons">
-            <button class="cookie-btn btn-accept-all" onclick="acceptAllCookies()">
-            </button>
-            <button class="cookie-btn btn-reject-all" onclick="rejectAllCookies()">
-            </button>
-            <button class="cookie-btn btn-accept-selected" onclick="acceptSelectedCookies()">
-            </button>
-            <button class="cookie-btn btn-detail-settings" onclick="showDetailSettings()">
-            </button>
+        <!-- Additional Information Section -->
+        <div class="cookie-additional-info" role="region" aria-labelledby="additional-info-title">
+            <details>
+                <summary id="additional-info-title">Your Privacy Rights & Additional Information</summary>
+                <div class="additional-info-content">
+                    <h4>Your Rights Under GDPR</h4>
+                    <p>You have the right to access, rectify, erase, restrict processing, object to processing, and data
+                        portability regarding your personal data. You can withdraw consent at any time without affecting
+                        the lawfulness of processing based on consent before its withdrawal.</p>
+
+                    <h4>Data Transfers</h4>
+                    <p>Some of our service providers are located in countries outside the EU/EEA. We ensure appropriate
+                        safeguards are in place, including adequacy decisions and standard contractual clauses.</p>
+
+                    <h4>Contact Information</h4>
+                    <p>For questions about data processing or to exercise your rights, contact our Data Protection
+                        Officer at: <strong id="dpo-contact">privacy@yourcompany.com</strong></p>
+
+                    <h4>How to Manage Cookies</h4>
+                    <p>You can also manage cookies directly in your browser settings. However, disabling certain cookies
+                        may affect website functionality.</p>
+
+                    <div class="policy-links">
+                        <a href="/privacy-policy" target="_blank" rel="noopener" id="privacy-policy-link">Privacy
+                            Policy</a>
+                        <span aria-hidden="true">|</span>
+                        <a href="/cookie-policy" target="_blank" rel="noopener" id="cookie-policy-link">Cookie
+                            Policy</a>
+                        <span aria-hidden="true">|</span>
+                        <a href="/terms" target="_blank" rel="noopener" id="terms-link">Terms of Service</a>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div id="cookie-messages" role="status" aria-live="polite" aria-atomic="true" class="sr-only">
+            <!-- Dynamic messages inserted here -->
         </div>
     </div>
 </div>
 
-<!-- Cookie Settings Link -->
-<a href="#" class="cookie-settings-link" onclick="showCookieBanner(); return false;">
+<!-- Persistent Settings Link (shown when banner is hidden) -->
+<a href="#" class="cookie-settings-link" onclick="showCookieBanner(); return false;" aria-label="Open cookie settings">
+    Cookie Settings
 </a>
+
+<!-- Screen Reader Only Text -->
+<style>
+    .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    .policy-links {
+        margin-top: 16px;
+        text-align: center;
+    }
+
+    .policy-links a {
+        color: #007bff;
+        text-decoration: none;
+        margin: 0 8px;
+    }
+
+    .policy-links a:hover,
+    .policy-links a:focus {
+        text-decoration: underline;
+    }
+
+    .additional-info-content {
+        padding: 16px 0;
+        border-top: 1px solid #e9ecef;
+        margin-top: 12px;
+    }
+
+    .additional-info-content h4 {
+        margin: 16px 0 8px 0;
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .additional-info-content p {
+        margin: 8px 0 16px 0;
+        line-height: 1.5;
+        color: #6c757d;
+    }
+
+    details summary {
+        cursor: pointer;
+        padding: 12px 0;
+        font-weight: 600;
+        color: #495057;
+        border-top: 1px solid #e9ecef;
+        outline: none;
+    }
+
+    details summary:focus {
+        outline: 2px solid #007bff;
+        outline-offset: 2px;
+    }
+
+    details summary:hover {
+        color: #007bff;
+    }
+
+    details[open] summary {
+        margin-bottom: 0;
+    }
+</style>

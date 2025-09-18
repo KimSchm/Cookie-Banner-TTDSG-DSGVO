@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cookie Banner – Minimal Example</title>
+    <link rel="stylesheet" href="../cookie/cookie.css" />
+    <script src="../cookie/cookie.js" defer></script>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; }
+      main { max-width: 800px; margin: 4rem auto; padding: 0 1rem; }
+      .card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: .5rem; }
+    </style>
+  </head>
+  <body>
+    <!-- 1) Container for cookie banner -->
+    <div class="cookie-container"></div>
+
+    <!-- 2) Optional: block interaction until choice is made -->
+    <div id="cookie-block-overlay">
+      <main>
+        <h1>Welcome</h1>
+        <p>This is a minimal page to try the Cookie Banner. Open devtools to see consent logs.</p>
+
+        <div class="card">
+          <p>
+            Try the public helpers:
+            <button class="btn btn--secondary" onclick="acceptAllCookies()">Accept All</button>
+            <button class="btn btn--outline" onclick="rejectAllCookies()">Decline All</button>
+            <button class="btn btn--primary" onclick="showCookieBanner()">Open Settings</button>
+          </p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

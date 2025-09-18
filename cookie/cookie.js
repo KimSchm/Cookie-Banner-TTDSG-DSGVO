@@ -1,94 +1,600 @@
-// TTDSG/DSGVO compliant Cookie Management
 class TTDSGCookieManager {
-    GTM_ID; // Google Tag Manager ID that is set in cookie.json
-
-    /**
-     * Initializes the cookie manager with the given GTM ID.
-     * @param {string} GTM_ID  Google Tag Manager ID
-     */
     constructor(GTM_ID) {
         this.GTM_ID = GTM_ID;
+        this.consentVersion = '2.0';
+        this.scriptsBlocked = true;
         this.consentData = this.loadConsent();
+
+        // Initialize accessibility features
+        this.setupAccessibilityFeatures();
+
+        // Block all tracking initially
+        this.blockAllTracking();
+
         this.initBanner();
         this.restoreToggles();
         document.querySelector('.cookie-container').hidden = false;
+
+        // Setup withdrawal mechanisms
+        this.setupWithdrawalMechanisms();
     }
 
     /**
-     * Restore the state of the UI toggle state from the consent data.
-     */
-    restoreToggles() {
-        // Restore the UI toggle state from consentData
-        const consent = this.consentData;
-        const analyticsToggle = document.getElementById('analytics-toggle');
-        if (analyticsToggle){
-            if (consent && typeof consent.analytics === 'boolean') {
-                if (consent.analytics) {
-                    analyticsToggle.classList.add('active');
-                    analyticsToggle.setAttribute('aria-checked', 'true');
-                } else {
-                    analyticsToggle.classList.remove('active');
-                    analyticsToggle.setAttribute('aria-checked', 'false');
-                }
-            } else {
-                analyticsToggle.classList.remove('active');
-                analyticsToggle.setAttribute('aria-checked', 'false');
-            }
-        }
-        const marketingToggle = document.getElementById('marketing-toggle');
-        if (marketingToggle){
-            if (consent && typeof consent.marketing === 'boolean') {
-                if (consent.marketing) {
-                    marketingToggle.classList.add('active');
-                    marketingToggle.setAttribute('aria-checked', 'true');
-                } else {
-                    marketingToggle.classList.remove('active');
-                    marketingToggle.setAttribute('aria-checked', 'false');
-                }
-            } else {
-                marketingToggle.classList.remove('active');
-                marketingToggle.setAttribute('aria-checked', 'false');
-            }
-        }
-    }
-
-    /**
-     * Load saved consent data from localStorage.
-     * @returns {Object|null} The consent data or null if not found.
+     * Enhanced consent storage with comprehensive audit trail
      */
     loadConsent() {
         const saved = localStorage.getItem('cookie-consent');
         if (saved) {
             try {
-                return JSON.parse(saved);
+                const consent = JSON.parse(saved);
+                // Validate consent structure and version
+                if (this.isValidConsent(consent)) {
+                    return consent;
+                } else {
+                    console.warn('Outdated consent format, requiring new consent');
+                    this.clearConsent();
+                }
             } catch (e) {
                 console.warn('Invalid consent data, resetting');
+                this.clearConsent();
             }
         }
         return null;
     }
 
     /**
-     * Save consent data to localStorage and apply settings.
-     * @param {Object} consent The consent data to save.
+     * Validate consent data structure
      */
-    saveConsent(consent) {
-        const consentData = {
-            ...consent,
-            timestamp: new Date().toISOString(),
-            version: '1.0'
-        };
-        localStorage.setItem('cookie-consent', JSON.stringify(consentData));
-        this.consentData = consentData;
-        this.applyConsent();
+    isValidConsent(consent) {
+        return consent &&
+            consent.version &&
+            consent.timestamp &&
+            consent.consentId &&
+            typeof consent.necessary === 'boolean';
     }
 
     /**
-     * Initialize the cookie banner based on consent data.
-     * Shows the banner if no consent is given, otherwise applies consent settings.
+     * Enhanced consent saving with comprehensive documentation
      */
+    saveConsent(consent) {
+        try {
+            const consentData = {
+                ...consent,
+                timestamp: new Date().toISOString(),
+                version: this.consentVersion,
+                consentId: this.generateConsentId(),
+                userAgent: navigator.userAgent,
+                pageUrl: window.location.href,
+                language: this.getPageLanguage(),
+                services: this.buildServiceConsent(consent),
+                withdrawalHistory: this.consentData?.withdrawalHistory || [],
+                lastModified: new Date().toISOString()
+            };
+
+            // Store consent with error handling
+            localStorage.setItem('cookie-consent', JSON.stringify(consentData));
+            this.consentData = consentData;
+            this.scriptsBlocked = false;
+            this.applyConsent();
+
+            this.showSuccessMessage("Your cookie preferences have been saved successfully.");
+            this.logConsentEvent('consent_given', consentData);
+
+        } catch (error) {
+            console.error('Failed to save consent:', error);
+            this.showErrorMessage("Failed to save your preferences. Please try again.");
+        }
+    }
+
+    /**
+     * Generate unique consent ID for tracking
+     */
+    generateConsentId() {
+        return 'consent_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    /**
+     * Build detailed service consent mapping
+     */
+    buildServiceConsent(consent) {
+        const services = {};
+        const timestamp = new Date().toISOString();
+
+        if (consent.analytics) {
+            services.googleAnalytics = {
+                consented: true,
+                timestamp: timestamp,
+                purpose: 'Website analytics and performance monitoring'
+            };
+            services.gtm = {
+                consented: true,
+                timestamp: timestamp,
+                purpose: 'Tag management for analytics and marketing tools'
+            };
+        }
+
+        if (consent.marketing) {
+            services.marketingCookies = {
+                consented: true,
+                timestamp: timestamp,
+                purpose: 'Personalized advertising and remarketing'
+            };
+        }
+
+        services.essential = {
+            consented: true,
+            timestamp: timestamp,
+            purpose: 'Essential website functionality and security'
+        };
+
+        return services;
+    }
+
+    /**
+     * Enhanced consent withdrawal mechanism
+     */
+    withdrawConsent(categories = ['analytics', 'marketing']) {
+        if (!this.consentData) return;
+
+        const withdrawalRecord = {
+            timestamp: new Date().toISOString(),
+            withdrawnCategories: categories,
+            previousConsent: { ...this.consentData },
+            method: 'user_initiated'
+        };
+
+        // Add to withdrawal history
+        const withdrawalHistory = this.consentData.withdrawalHistory || [];
+        withdrawalHistory.push(withdrawalRecord);
+
+        // Create new consent with withdrawn categories
+        const newConsent = { ...this.consentData };
+        categories.forEach(category => {
+            if (category !== 'necessary') {
+                newConsent[category] = false;
+            }
+        });
+        newConsent.withdrawalHistory = withdrawalHistory;
+        newConsent.lastModified = new Date().toISOString();
+
+        try {
+            localStorage.setItem('cookie-consent', JSON.stringify(newConsent));
+            this.consentData = newConsent;
+            this.applyConsent();
+
+            this.showSuccessMessage("Your consent has been withdrawn successfully.");
+            this.logConsentEvent('consent_withdrawn', withdrawalRecord);
+
+        } catch (error) {
+            console.error('Failed to withdraw consent:', error);
+            this.showErrorMessage("Failed to withdraw consent. Please try again.");
+        }
+    }
+
+    /**
+     * Complete consent withdrawal (reset to essential only)
+     */
+    withdrawAllConsent() {
+        this.withdrawConsent(['analytics', 'marketing', 'functional', 'social_media']);
+
+        // Update UI toggles
+        this.updateToggleStates({
+            necessary: true,
+            analytics: false,
+            marketing: false,
+            functional: false,
+            social_media: false
+        });
+
+        this.hideBanner();
+    }
+
+    /**
+     * Clear all consent data
+     */
+    clearConsent() {
+        localStorage.removeItem('cookie-consent');
+        this.consentData = null;
+        this.scriptsBlocked = true;
+        this.blockAllTracking();
+    }
+
+    /**
+     * Enhanced script blocking before consent
+     */
+    blockAllTracking() {
+        // Block Google Tag Manager
+        window['ga-disable-' + this.GTM_ID] = true;
+
+        // Block Google Analytics
+        if (typeof window.gtag !== 'undefined') {
+            window.gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied'
+            });
+        }
+
+        // Block other common tracking scripts
+        window.disableGoogleAnalytics = true;
+        window.ga_debug = false;
+    }
+
+    /**
+     * Enhanced consent application with proper unblocking
+     */
+    applyConsent() {
+        const consent = this.consentData;
+        if (!consent) return;
+
+        // Apply analytics consent
+        if (consent.analytics) {
+            this.enableAnalytics();
+        } else {
+            this.disableAnalytics();
+        }
+
+        // Apply marketing consent  
+        if (consent.marketing) {
+            this.enableMarketing();
+        } else {
+            this.disableMarketing();
+        }
+
+        // Log consent application
+        this.logConsentEvent('consent_applied', {
+            analytics: consent.analytics,
+            marketing: consent.marketing
+        });
+    }
+
+    /**
+     * Enable analytics with proper consent signals
+     */
+    enableAnalytics() {
+        if (!window.gtm_loaded && this.GTM_ID) {
+            this.loadGTM();
+        }
+
+        // Update Google consent mode
+        if (typeof window.gtag !== 'undefined') {
+            window.gtag('consent', 'update', {
+                'analytics_storage': 'granted'
+            });
+        }
+    }
+
+    /**
+     * Disable analytics completely
+     */
+    disableAnalytics() {
+        window['ga-disable-' + this.GTM_ID] = true;
+
+        if (typeof window.gtag !== 'undefined') {
+            window.gtag('consent', 'update', {
+                'analytics_storage': 'denied'
+            });
+        }
+    }
+
+    /**
+     * Enable marketing cookies
+     */
+    enableMarketing() {
+        if (typeof window.gtag !== 'undefined') {
+            window.gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'personalization_storage': 'granted'
+            });
+        }
+    }
+
+    /**
+     * Disable marketing cookies
+     */
+    disableMarketing() {
+        if (typeof window.gtag !== 'undefined') {
+            window.gtag('consent', 'update', {
+                'ad_storage': 'denied',
+                'personalization_storage': 'denied'
+            });
+        }
+    }
+
+    /**
+     * Enhanced GTM loading with consent validation
+     */
+    loadGTM() {
+        if (window.gtm_loaded || !this.consentData?.analytics) return;
+
+        window.gtm_loaded = true;
+
+        // Initialize GTM with consent mode
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtm.js?id=${this.GTM_ID}`;
+
+        script.onload = () => {
+            this.logConsentEvent('gtm_loaded', { gtm_id: this.GTM_ID });
+        };
+
+        document.head.appendChild(script);
+    }
+
+    /**
+     * Setup comprehensive accessibility features
+     */
+    setupAccessibilityFeatures() {
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const banner = document.getElementById('cookieBanner');
+                if (banner && !banner.classList.contains('hidden')) {
+                    this.rejectAllCookies();
+                }
+            }
+        });
+
+        // Focus management
+        this.setupFocusManagement();
+    }
+
+    /**
+     * Setup focus management for accessibility
+     */
+    setupFocusManagement() {
+        // Store previously focused element
+        this.previouslyFocused = null;
+
+        // Focus trap implementation
+        this.setupFocusTrap();
+    }
+
+    setupFocusTrap() {
+        const banner = document.getElementById('cookieBanner');
+        if (!banner) return;
+
+        const focusableElements = banner.querySelectorAll(
+            'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], [contenteditable]'
+        );
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        banner.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) { // Shift + Tab
+                    if (document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    }
+                } else { // Tab
+                    if (document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Setup withdrawal mechanisms
+     */
+    setupWithdrawalMechanisms() {
+        // Add withdrawal link if consent exists
+        if (this.consentData) {
+            this.addWithdrawalLink();
+        }
+    }
+
+    /**
+     * Add withdrawal link to page
+     */
+    addWithdrawalLink() {
+        const existingLink = document.querySelector('.cookie-withdrawal-link');
+        if (existingLink) return;
+
+        const withdrawalLink = document.createElement('a');
+        withdrawalLink.className = 'cookie-withdrawal-link';
+        withdrawalLink.href = '#';
+        withdrawalLink.textContent = 'Withdraw Cookie Consent';
+        withdrawalLink.setAttribute('aria-label', 'Withdraw your cookie consent');
+
+        withdrawalLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showWithdrawalDialog();
+        });
+
+        // Position withdrawal link
+        withdrawalLink.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+            z-index: 9998;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        `;
+
+        document.body.appendChild(withdrawalLink);
+    }
+
+    /**
+     * Show withdrawal confirmation dialog
+     */
+    showWithdrawalDialog() {
+        const dialog = this.createWithdrawalDialog();
+        document.body.appendChild(dialog);
+        dialog.focus();
+    }
+
+    /**
+     * Create withdrawal dialog
+     */
+    createWithdrawalDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'cookie-withdrawal-dialog';
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-labelledby', 'withdrawal-title');
+        dialog.setAttribute('aria-modal', 'true');
+
+        dialog.innerHTML = `
+            <div class="withdrawal-backdrop"></div>
+            <div class="withdrawal-content">
+                <h3 id="withdrawal-title">Withdraw Cookie Consent</h3>
+                <p>You can withdraw your consent for cookie categories at any time.</p>
+                <div class="withdrawal-options">
+                    <label>
+                        <input type="checkbox" checked id="withdraw-analytics"> Analytics Cookies
+                    </label>
+                    <label>
+                        <input type="checkbox" checked id="withdraw-marketing"> Marketing Cookies
+                    </label>
+                </div>
+                <div class="withdrawal-buttons">
+                    <button onclick="this.parentNode.parentNode.parentNode.remove()" 
+                            class="btn-cancel">Cancel</button>
+                    <button onclick="window.cookieManager.processWithdrawal()" 
+                            class="btn-withdraw">Withdraw Consent</button>
+                </div>
+            </div>
+        `;
+
+        return dialog;
+    }
+
+    /**
+     * Process withdrawal based on user selection
+     */
+    processWithdrawal() {
+        const categories = [];
+        if (document.getElementById('withdraw-analytics')?.checked) {
+            categories.push('analytics');
+        }
+        if (document.getElementById('withdraw-marketing')?.checked) {
+            categories.push('marketing');
+        }
+
+        this.withdrawConsent(categories);
+
+        // Remove dialog
+        document.querySelector('.cookie-withdrawal-dialog')?.remove();
+
+        // Update UI
+        this.updateToggleStates(this.consentData);
+    }
+
+    /**
+     * Enhanced language detection with fallbacks
+     */
+    getPageLanguage() {
+        let lang = document.documentElement.lang || navigator.language || 'en';
+        // Normalize language codes
+        const langMapping = {
+            'de': 'ger',
+            'de-DE': 'ger',
+            'de-AT': 'ger',
+            'de-CH': 'ger',
+            'de-LU': 'ger',
+            'en': 'en',
+            'en-US': 'en',
+            'en-GB': 'en',
+            'en-AU': 'en'
+        };
+
+        return langMapping[lang] || langMapping[lang.split('-')[0]] || 'en';
+    }
+
+    /**
+     * Update toggle states in UI
+     */
+    updateToggleStates(consent) {
+        const categories = ['analytics', 'marketing', 'functional', 'social_media'];
+
+        categories.forEach(category => {
+            const toggle = document.getElementById(`${category}-toggle`);
+            if (toggle) {
+                const isActive = consent[category] || false;
+                this.setCookieToggleElement(toggle, isActive.toString());
+            }
+        });
+    }
+
+    /**
+     * Show success message to user
+     */
+    showSuccessMessage(message) {
+        this.showMessage(message, 'success');
+    }
+
+    /**
+     * Show error message to user  
+     */
+    showErrorMessage(message) {
+        this.showMessage(message, 'error');
+    }
+
+    /**
+     * Display user feedback messages
+     */
+    showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `cookie-message cookie-message-${type}`;
+        messageDiv.textContent = message;
+        messageDiv.setAttribute('role', 'alert');
+
+        messageDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: white;
+            z-index: 10001;
+            max-width: 300px;
+            background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        `;
+
+        document.body.appendChild(messageDiv);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 3000);
+    }
+
+    /**
+     * Log consent events for debugging and compliance
+     */
+    logConsentEvent(eventType, data) {
+        if (console && typeof console.log === 'function') {
+            console.log(`[Cookie Consent] ${eventType}:`, {
+                timestamp: new Date().toISOString(),
+                event: eventType,
+                data: data
+            });
+        }
+    }
+
+    // Restore existing methods with enhancements
+    restoreToggles() {
+        const consent = this.consentData;
+        if (!consent) return;
+
+        this.updateToggleStates(consent);
+    }
+
     initBanner() {
-        // Banner zeigen wenn keine Einwilligung vorhanden
         if (!this.consentData) {
             this.showBanner();
         } else {
@@ -97,416 +603,322 @@ class TTDSGCookieManager {
         }
     }
 
-    /**
-     * Show the cookie consent banner.
-     */
     showBanner() {
-        document.getElementsByClassName('cookie-block-overlay')[0].id = 'cookie-block-overlay';
-        document.getElementById('cookieBanner').classList.remove('hidden');
-        document.getElementById('cookieBanner').focus();
+        const overlay = document.querySelector('.cookie-block-overlay');
+        if (overlay) overlay.id = 'cookie-block-overlay';
+
+        const banner = document.getElementById('cookieBanner');
+        if (banner) {
+            banner.classList.remove('hidden');
+            // Focus management for accessibility
+            const firstButton = banner.querySelector('button');
+            if (firstButton) {
+                setTimeout(() => firstButton.focus(), 100);
+            }
+        }
     }
 
-    /**
-     * Hide the cookie consent banner.
-     */
     hideBanner() {
-        document.getElementById('cookieBanner').classList.add('hidden');
-        // Ensure no blocking if consent already given
-        document.getElementsByClassName('cookie-block-overlay')[0].id = '';
-    }
-
-    /**
-     * Apply consent settings by enabling/disabling scripts based on user choices.
-     */
-    applyConsent() {
-        const consent = this.consentData;
-        if (!consent) return;
-
-        // activate / deactivate Analytics Cookies
-        if (consent.analytics) {
-            this.loadGTM();
-            // Add other analytics scripts here if needed
-        } else {
-            this.removeGTM();
-            // Add other analytics removal logic here if needed
+        const banner = document.getElementById('cookieBanner');
+        if (banner) {
+            banner.classList.add('hidden');
         }
-        // activate / deactivate Marketing Cookies
-        if (consent.marketing) {
-            // Add marketing scripts here if needed
-        } else {
-            // Add marketing removal logic here if needed
+
+        const overlay = document.querySelector('.cookie-block-overlay');
+        if (overlay) overlay.id = '';
+    }
+
+    setCookieToggleElement(element, state) {
+        try {
+            const isActive = state === 'true';
+            element.classList.toggle('active', isActive);
+            element.setAttribute('aria-checked', state);
+        } catch (error) {
+            console.error('Error setting cookie toggle:', error);
         }
-    }
-
-    /**
-     * Load Google Tag Manager script dynamically.
-     * This function ensures GTM is only loaded once.
-     */
-    loadGTM() {
-        if (window.gtm_loaded) return;
-        window.gtm_loaded = true;
-        (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-            var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
-            j.async = true;
-            j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-            f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', this.GTM_ID);
-    }
-
-    /**
-     * Disable Google Tag Manager by setting the appropriate flag.
-     * This prevents any tracking scripts from running.
-     */
-    removeGTM() {
-        window['ga-disable-' + this.GTM_ID] = true;
     }
 }
 
+// Enhanced global functions with error handling
+function acceptAllCookies() {
+    if (!window.cookieManager) return;
 
-// Load Cookie Banner HTML
-fetch('cookie/cookie.html')
-    .then(response => response.text())
-    .then(html => {
-        document.querySelector('.cookie-container').innerHTML = html;
-        fetch('cookie/cookie.json')
-            .then(response => response.json())
-            .then(data => {
-                window.cookieManager = new TTDSGCookieManager(data.GTM_ID);
-                // get language from html tag
-                const lang = document.documentElement.lang;
-                // Get correct data for the current language
-                let descriptions_data = null;
-                for (const key in data.descriptions) {
-                    if (key === lang) {
-                        descriptions_data = data.descriptions[key];
-                        break;
-                    }
-                }
-                if (!descriptions_data) {
-                    console.warn(`Data for ${lang} not found, falling back to 'en'`);
-                    descriptions_data = data.descriptions['en'];
-                }
-                // Get correct info data for the current language
-                let info = data.type_description.find(obj => obj.lang === lang);
-                if (!info) {
-                    console.warn(`Type description for ${lang} not found, falling back to 'en'`);
-                    info = data.type_description.find(obj => obj.lang === 'en');
-                }
-                // Dynamically populate the cookie info section
-                try {
-                    // Necessary Cookies
-                    if (descriptions_data[0].NEEDED === undefined) {
-                        throw new Error('No NEEDED cookie data found, but base structure is required.');
-                    }
-                    let necessaryContainer = document.getElementById('necessary-details');
-                    document.getElementById('necessary-title').innerHTML = info.NEEDED;
-                    const necessaryInfo = createNecessaryCookieInfo(descriptions_data[0].NEEDED, info);
-                    necessaryContainer.innerHTML += necessaryInfo;
-                } catch (error) {
-                    console.warn('Error populating necessary cookie info:', error);
-                }
-                try {
-                    // Analytics Cookies
-                    if (descriptions_data[0].ANALYTICS !== undefined) {
-                        let analyticsContainer = document.getElementById('analytics-details');
-                        document.getElementById('analytics-title').innerHTML = info.ANALYTICS;
-                        const analyticsInfo = createAnalyticsCookieInfo(descriptions_data[0].ANALYTICS, info);
-                        analyticsContainer.innerHTML += analyticsInfo;
-                    } else adocument.getElementById('analytics-category').hidden = true;
-                } catch (error) {
-                    console.warn('Error populating analytics cookie info:', error);
-                }
-                try {
-                    // Marketing Cookies
-                    if (descriptions_data[0].MARKETING !== undefined) {
-                        let marketingContainer = document.getElementById('marketing-details');
-                        document.getElementById('marketing-title').innerHTML = info.MARKETING;
-                        const marketingInfo = createMarketingCookieInfo(descriptions_data[0].MARKETING, info);
-                        marketingContainer.innerHTML += marketingInfo;
-                    } else document.getElementById('marketing-category').hidden = true;
-                } catch (error) {
-                    console.warn('Error populating marketing cookie info:', error);
-                }
-                // set button texts and aria-labels from info
-                try {
-                    document.getElementsByClassName('btn-accept-all')[0].innerText = info.accept_all;
-                    document.getElementsByClassName('btn-accept-all')[0].setAttribute('aria-label', info.accept_all);
-                    document.getElementsByClassName('btn-reject-all')[0].innerText = info.decline_all;
-                    document.getElementsByClassName('btn-reject-all')[0].setAttribute('aria-label', info.decline_all);
-                    document.getElementsByClassName('btn-accept-selected')[0].innerText = info.save_selected;
-                    document.getElementsByClassName('btn-accept-selected')[0].setAttribute('aria-label', info.save_selected);
-                    document.getElementsByClassName('btn-detail-settings')[0].innerText = info.details;
-                    document.getElementsByClassName('btn-detail-settings')[0].setAttribute('aria-label', info.details_aria);
-                    document.querySelector('.cookie-settings-link').innerText = info.settings;
-                    document.querySelector('.cookie-settings-link').setAttribute('aria-label', info.settings_aria);
-                    document.getElementById('cookie-title').innerText = info.title;
-                    document.getElementById('cookie-desc').innerText = info.title_description;
-                } catch (error) {
-                    console.debug('Error setting button texts and aria-labels:', error);
-                }
-            });
-        document.querySelectorAll('.category-header').forEach(header => {
-            header.addEventListener('click', function () {
-                const category = this.getAttribute('data-category');
-                toggleCategory(category);
-            });
-            header.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    const category = this.getAttribute('data-category');
-                    toggleCategory(category);
-                }
-            });
+    const consent = {
+        necessary: true,
+        analytics: true,
+        marketing: true,
+        functional: true,
+        social_media: true
+    };
 
-        });
-        // Attach listeners to toggles
-        try {
-            document.getElementById('analytics-toggle').addEventListener('click', function (e) {
-                e.stopPropagation();
-                toggleCookieCategory('analytics');
-            });
-        } catch (error) {
-            console.debug('Error attaching analytics toggle listener:', error);
-        }
-        try {
-            document.getElementById('marketing-toggle').addEventListener('click', function (e) {
-                e.stopPropagation();
-                toggleCookieCategory('marketing');
-            });
-        } catch (error) {
-            console.debug('Error attaching marketing toggle listener:', error);
-        }
+    window.cookieManager.saveConsent(consent);
+    window.cookieManager.hideBanner();
+    window.cookieManager.updateToggleStates(consent);
+}
 
-    })
-    .catch(err => {
-        console.error('Failed to load cookie banner HTML:', err);
-    });
+function rejectAllCookies() {
+    if (!window.cookieManager) return;
 
-// Keyboard navigation
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        const banner = document.getElementById('cookieBanner');
-        if (!banner.classList.contains('hidden')) {
-            rejectAllCookies(); // ESC = Reject all
-        }
+    const consent = {
+        necessary: true,
+        analytics: false,
+        marketing: false,
+        functional: false,
+        social_media: false
+    };
+
+    window.cookieManager.saveConsent(consent);
+    window.cookieManager.hideBanner();
+    window.cookieManager.updateToggleStates(consent);
+}
+
+function acceptSelectedCookies() {
+    if (!window.cookieManager) return;
+
+    const consent = {
+        necessary: true,
+        analytics: getCookieToggleState('analytics'),
+        marketing: getCookieToggleState('marketing'),
+        functional: getCookieToggleState('functional'),
+        social_media: getCookieToggleState('social_media')
+    };
+
+    window.cookieManager.saveConsent(consent);
+    window.cookieManager.hideBanner();
+}
+
+function getCookieToggleState(category) {
+    try {
+        const toggle = document.getElementById(category + '-toggle');
+        return toggle ? toggle.classList.contains('active') : false;
+    } catch (error) {
+        console.error('Error getting toggle state:', error);
+        return false;
     }
+}
+
+function toggleCookieCategory(category) {
+    if (category === 'necessary') return;
+
+    try {
+        const toggle = document.getElementById(category + '-toggle');
+        const isActive = toggle.classList.contains('active');
+        window.cookieManager.setCookieToggleElement(toggle, (!isActive).toString());
+    } catch (error) {
+        console.error('Error toggling category:', error);
+    }
+}
+
+function showCookieBanner() {
+    if (window.cookieManager) {
+        window.cookieManager.showBanner();
+    }
+}
+
+function showWithdrawalDialog() {
+    if (window.cookieManager) {
+        window.cookieManager.showWithdrawalDialog();
+    }
+}
+
+// Enhanced initialization with error handling
+document.addEventListener('DOMContentLoaded', function () {
+    // Load banner HTML and initialize
+    fetch('cookie/cookie.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load banner HTML');
+            return response.text();
+        })
+        .then(html => {
+            const container = document.querySelector('.cookie-container');
+            if (!container) {
+                console.error('Cookie container not found');
+                return;
+            }
+
+            container.innerHTML = html;
+
+            // Load configuration and initialize manager
+            return fetch('cookie/cookie.json');
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load cookie configuration');
+            return response.json();
+        })
+        .then(data => {
+            // Initialize cookie manager
+            window.cookieManager = new TTDSGCookieManager(data.GTM_ID);
+
+            // Setup UI based on configuration
+            setupCookieInterface(data);
+        })
+        .catch(error => {
+            console.error('Failed to initialize cookie banner:', error);
+            // Show fallback message
+            document.querySelector('.cookie-container').innerHTML =
+                '<div class="cookie-error">Failed to load cookie banner. Please refresh the page.</div>';
+        });
 });
 
-// Unhide cookie banner
+function setupCookieInterface(data) {
+    const lang = window.cookieManager.getPageLanguage();
 
-/**
- * Create HTML for necessary cookie information.
- * @param {Array} neededData Array of NEEDED cookie info objects
- * @param {Object} typeDescription  Descriptions for the fields in the current language
- * @returns {string} HTML string of necessary cookie information
- */
-function createNecessaryCookieInfo(neededData, typeDescription) {
-    const html = [`<h3>${typeDescription.NEEDED_DESC}:</h3>`];
-    neededData.forEach(element => {
+    // Get language-specific data
+    let descriptions_data = data.descriptions[lang] || data.descriptions['en'];
+    let info = data.type_description.find(obj => obj.lang === lang) ||
+        data.type_description.find(obj => obj.lang === 'en');
+
+    if (!descriptions_data || !info) {
+        console.error('Missing language data for:', lang);
+        return;
+    }
+
+    // Setup UI elements with error handling
+    try {
+        setupCookieCategories(descriptions_data[0], info);
+        setupButtonTexts(info);
+        setupEventListeners();
+    } catch (error) {
+        console.error('Error setting up cookie interface:', error);
+    }
+}
+
+function setupCookieCategories(descriptions, info) {
+    // Setup necessary cookies
+    if (descriptions.NEEDED) {
+        const container = document.getElementById('necessary-details');
+        const title = document.getElementById('necessary-title');
+        if (container && title) {
+            title.textContent = info.NEEDED;
+            container.innerHTML = createCookieInfo(descriptions.NEEDED, info, 'NEEDED');
+        }
+    }
+
+    // Setup analytics cookies
+    if (descriptions.ANALYTICS) {
+        const container = document.getElementById('analytics-details');
+        const title = document.getElementById('analytics-title');
+        if (container && title) {
+            title.textContent = info.ANALYTICS;
+            container.innerHTML = createCookieInfo(descriptions.ANALYTICS, info, 'ANALYTICS');
+        }
+    } else {
+        const category = document.getElementById('analytics-category');
+        if (category) category.hidden = true;
+    }
+
+    // Setup marketing cookies
+    if (descriptions.MARKETING) {
+        const container = document.getElementById('marketing-details');
+        const title = document.getElementById('marketing-title');
+        if (container && title) {
+            title.textContent = info.MARKETING;
+            container.innerHTML = createCookieInfo(descriptions.MARKETING, info, 'MARKETING');
+        }
+    } else {
+        const category = document.getElementById('marketing-category');
+        if (category) category.hidden = true;
+    }
+}
+
+function createCookieInfo(cookieData, typeDescription, category) {
+    const descKey = category + '_DESC';
+    const html = [`<h4>${typeDescription[descKey] || 'Cookie Information'}:</h4>`];
+
+    cookieData.forEach(element => {
         html.push(`
-            <br>
             <div class="cookie-info">
-                <p><strong>${typeDescription.provider}:</strong> ${element.provider}</p>
-                <p><strong>${typeDescription.example}:</strong> ${element.example}</p>
-                <p><strong>${typeDescription.legal_basis}:</strong> ${element.legal_basis}</p>
-                <p><strong>${typeDescription.duration}:</strong> ${element.duration}</p>
+                <p><strong>${typeDescription.provider || 'Provider'}:</strong> ${element.provider || 'Not specified'}</p>
+                <p><strong>${typeDescription.purpose || 'Purpose'}:</strong> ${element.purpose || element.example || 'Not specified'}</p>
+                <p><strong>${typeDescription.legal_basis || 'Legal Basis'}:</strong> ${element.legal_basis || 'Not specified'}</p>
+                <p><strong>${typeDescription.duration || 'Duration'}:</strong> ${element.duration || 'Not specified'}</p>
+                ${element.data_transferred ? `<p><strong>${typeDescription.data_transferred || 'Data Transfer'}:</strong> ${element.data_transferred}</p>` : ''}
+                ${element.withdrawal ? `<p><strong>${typeDescription.withdrawal || 'Withdrawal'}:</strong> ${element.withdrawal}</p>` : ''}
             </div>
         `);
     });
+
     return html.join('');
 }
 
-/**
- * Create HTML for analytics cookie information.
- * @param {Array} analyticsData Array of ANALYTICS cookie info objects
- * @param {Object} typeDescription  Descriptions for the fields in the current language
- * @returns {string} HTML string of analytics cookie information
- */
-function createAnalyticsCookieInfo(analyticsData, typeDescription) {
-    const html = [`<h3>${typeDescription.ANALYTICS_DESC}:</h3>`];
-    analyticsData.forEach(element => {
-        html.push(`
-            <br>
-            <div class="cookie-info">
-                <p><strong>${typeDescription.provider}:</strong> ${element.provider}</p>
-                <p><strong>${typeDescription.data}:</strong> ${element.data}</p>
-                <p><strong>${typeDescription.data_transferred}:</strong> ${element.data_transferred}</p>
-                <p><strong>${typeDescription.legal_basis}:</strong> ${element.legal_basis}</p>
-                <p><strong>${typeDescription.duration}:</strong> ${element.duration}</p>
-                <p><strong>${typeDescription.withdrawal}:</strong> ${element.withdrawal}</p>
-            </div>
-        `);
+function setupButtonTexts(info) {
+    const elements = [
+        { selector: '.btn-accept-all', text: info.accept_all, aria: info.accept_all_aria || info.accept_all },
+        { selector: '.btn-reject-all', text: info.decline_all, aria: info.decline_all_aria || info.decline_all },
+        { selector: '.btn-accept-selected', text: info.save_selected, aria: info.save_selected_aria || info.save_selected },
+        { selector: '.btn-detail-settings', text: info.details, aria: info.details_aria || info.details },
+        { selector: '.cookie-settings-link', text: info.settings, aria: info.settings_aria || info.settings },
+        { selector: '#cookie-title', text: info.title, aria: null },
+        { selector: '#cookie-desc', text: info.title_description, aria: null }
+    ];
+
+    elements.forEach(({ selector, text, aria }) => {
+        const element = document.querySelector(selector);
+        if (element && text) {
+            if (element.tagName === 'INPUT') {
+                element.value = text;
+            } else {
+                element.textContent = text;
+            }
+            if (aria) {
+                element.setAttribute('aria-label', aria);
+            }
+        }
     });
-    return html.join('');
 }
 
-/**
- * Create HTML for marketing cookie information.
- * @param {Array} marketingData Array of MARKETING cookie info objects
- * @param {Object} typeDescription  Descriptions for the fields in the current language
- * @returns {string} HTML string of marketing cookie information
- */
-function createMarketingCookieInfo(marketingData, typeDescription) {
-    const html = [`<h3>${typeDescription.MARKETING_DESC}:</h3>`];
-    marketingData.forEach(element => {
-        html.push(`
-            <br>
-            <div class="cookie-info">
-                <p><strong>${typeDescription.provider}:</strong> ${element.provider}</p>
-                <p><strong>${typeDescription.data}:</strong> ${element.data}</p>
-                <p><strong>${typeDescription.data_transferred}:</strong> ${element.data_transferred}</p>
-                <p><strong>${typeDescription.legal_basis}:</strong> ${element.legal_basis}</p>
-                <p><strong>${typeDescription.duration}:</strong> ${element.duration}</p>
-                <p><strong>${typeDescription.withdrawal}:</strong> ${element.withdrawal}</p>
-            </div>
-        `);
+function setupEventListeners() {
+    // Category header listeners
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', function () {
+            const category = this.getAttribute('data-category');
+            toggleCategory(category);
+        });
+
+        header.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const category = this.getAttribute('data-category');
+                toggleCategory(category);
+            }
+        });
     });
-    return html.join('');
+
+    // Toggle listeners
+    ['analytics', 'marketing', 'functional', 'social_media'].forEach(category => {
+        const toggle = document.getElementById(`${category}-toggle`);
+        if (toggle) {
+            toggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                toggleCookieCategory(category);
+            });
+        }
+    });
 }
 
-/**
- * Toggle the visibility of a cookie category.
- * @param {string} category The category to toggle.
- */
 function toggleCategory(category) {
-    const details = document.getElementsByClassName('category-details');
+    const details = document.querySelectorAll('.category-details');
     const selected = document.getElementById(category + '-details');
+
+    if (!selected) return;
+
     const isExpanded = selected.classList.contains('expanded');
-    // Toggle the selected category
+
     if (!isExpanded) {
         // Close all other categories
-        Array.from(details).forEach(el => {
+        details.forEach(el => {
             if (el !== selected) {
                 el.classList.remove('expanded');
             }
         });
         selected.classList.add('expanded');
-    }
-    else {
+    } else {
         selected.classList.remove('expanded');
     }
 }
 
-/**
- * Toggle the state of a cookie category.
- * @param {string} category The category of the cookie.
- */
-function toggleCookieCategory(category) {
-    if (category === 'necessary') return; // Necessary cookies cannot be toggled
-    try {
-        const toggle = document.getElementById(category + '-toggle');
-        const isActive = toggle.classList.contains('active');
-        if (isActive) {
-            setCookieToggleElement(toggle, 'false');
-        } else {
-            setCookieToggleElement(toggle, 'true');
-        }
-    } catch (error) {
-        console.error('Error toggling cookie category:', error);
-    }
-}
-
-/**
- * Get the current state of a cookie toggle.
- * @param {string} category The category of the cookie.
- * @returns {boolean} The current state of the cookie toggle.
- */
-function getCookieToggleState(category) {
-    try {
-        const toggle = document.getElementById(category + '-toggle');
-        return toggle.classList.contains('active');
-    } catch (error) {
-        console.debug('Error getting cookie toggle state:', error);
-        return false;
-    }
-}
-
-/**
- * Set the visual state of a cookie toggle element.
- * @param {HTMLElement} element The toggle element to update.
- * @param {string} state The state to set ('true' or 'false').
- */
-function setCookieToggleElement(element, state) {
-    try {
-        (state == 'true') ? element.classList.add('active') : element.classList.remove('active');
-        element.setAttribute('aria-checked', state);
-    } catch (error) {
-        console.error('Error setting ', element.tagName, ' cookie category to state=', state, ':', error);
-    }
-}
-
-/**
- * Accept all cookies including non-essential ones.
- */
-function acceptAllCookies() {
-    const consent = {
-        necessary: true,
-        analytics: true,
-        marketing: true
-    };
-    cookieManager.saveConsent(consent);
-    cookieManager.hideBanner();
-    try {
-        setCookieToggleElement(document.getElementById('analytics-toggle'), 'true');
-    } catch (error) {
-        console.debug('Error loading analytics toggle:', error);
-    }
-    try {
-        setCookieToggleElement(document.getElementById('marketing-toggle'), 'true');
-    } catch (error) {
-        console.debug('Error loading marketing toggle:', error);
-    }
-}
-
-/**
- * Reject all non-essential cookies.
- */
-function rejectAllCookies() {
-    const consent = {
-        necessary: true,
-        analytics: false,
-        marketing: false
-    };
-    cookieManager.saveConsent(consent);
-    cookieManager.hideBanner();
-    try {
-        setCookieToggleElement(document.getElementById('analytics-toggle'), 'false');
-    } catch (error) {
-        console.debug('Error loading analytics toggle:', error);
-    }
-    try {
-        setCookieToggleElement(document.getElementById('marketing-toggle'), 'false');
-    } catch (error) {
-        console.debug('Error loading marketing toggle:', error);
-    }
-}
-
-/**
- * Accept selected cookies based on user preferences.
- */
-function acceptSelectedCookies() {
-    const consent = {
-        necessary: true,
-        analytics: getCookieToggleState('analytics'),
-        marketing: getCookieToggleState('marketing')
-    };
-    cookieManager.saveConsent(consent);
-    cookieManager.hideBanner();
-}
-
-/**
- * Show detailed settings by expanding all categories.
- */
 function showDetailSettings() {
     document.querySelectorAll('.category-details').forEach(el => {
         el.classList.add('expanded');
     });
-}
-
-/**
- * Show the cookie banner again for changing preferences.
- */
-function showCookieBanner() {
-    cookieManager.showBanner();
 }
