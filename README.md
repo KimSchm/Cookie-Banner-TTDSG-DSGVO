@@ -41,7 +41,7 @@ Lightweight, accessible, and privacy-first cookie consent banner. Blocks non-ess
 4) (Optional but recommended) Wrap your page content with the block overlay so interaction is prevented until a choice is made:
 
 ```html
-<div id="cookie-block-overlay">
+<div class="cookie-block-overlay">
 	<!-- Your page content -->
 </div>
 ```
