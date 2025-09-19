@@ -164,6 +164,10 @@ Contributions are welcome!
 
 Licensed under the terms of the `LICENSE` file in this repository.
 
+## Known Bugs
+
+- When withdrawalHistory is written it writes in it's self, insted of overwriting.
+
 ---
 
 Made with privacy in mind. If you build something with this, consider sharing it back via a PR!
