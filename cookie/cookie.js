@@ -139,7 +139,7 @@ class TTDSGCookieManager {
         const withdrawalRecord = {
             timestamp: new Date().toISOString(),
             withdrawnCategories: categories,
-            previousConsent: { ...this.consentData },
+            previousConsent: JSON.parse(JSON.stringify(this.consentData)),
             method: 'user_initiated'
         };
 
