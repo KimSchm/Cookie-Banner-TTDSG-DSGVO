@@ -131,21 +131,35 @@ class TTDSGCookieManager {
     }
 
     /**
+     * Clean cyclic data for JSON serialization
+     */
+    cleanCyclicData(obj, seen = new WeakSet()) {
+        if (obj && typeof obj === 'object') {
+            if (seen.has(obj)) {
+                return undefined; // Remove cyclic reference
+            }
+            seen.add(obj);
+            for (const key in obj) {
+                obj[key] = this.cleanCyclicData(obj[key], seen);
+            }
+        }
+        return obj;
+    }
+
+    /**
      * Enhanced consent withdrawal mechanism
      */
     withdrawConsent(categories = ['analytics', 'marketing']) {
         if (!this.consentData) return;
+        delete this.consentData.withdrawalHistory;
 
+        // Create withdrawal record
         const withdrawalRecord = {
             timestamp: new Date().toISOString(),
             withdrawnCategories: categories,
-            previousConsent: JSON.parse(JSON.stringify(this.consentData)),
+            previousConsent: { ...this.consentData },
             method: 'user_initiated'
         };
-
-        // Add to withdrawal history
-        const withdrawalHistory = this.consentData.withdrawalHistory || [];
-        withdrawalHistory.push(withdrawalRecord);
 
         // Create new consent with withdrawn categories
         const newConsent = { ...this.consentData };
@@ -154,11 +168,14 @@ class TTDSGCookieManager {
                 newConsent[category] = false;
             }
         });
-        newConsent.withdrawalHistory = withdrawalHistory;
+        newConsent.withdrawalHistory = withdrawalRecord;
         newConsent.lastModified = new Date().toISOString();
-
+        console.log('Withdrawing consent for categories:', categories);
+        console.log('New consent state:', newConsent);
         try {
-            localStorage.setItem('cookie-consent', JSON.stringify(newConsent));
+            // TODO: Fix "cyclic object value" error for JSON.stringify
+            const cleanedConsent = this.cleanCyclicData(newConsent);
+            localStorage.setItem('cookie-consent', JSON.stringify(cleanedConsent));
             this.consentData = newConsent;
             this.applyConsent();
 
