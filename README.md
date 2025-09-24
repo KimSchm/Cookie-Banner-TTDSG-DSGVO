@@ -169,7 +169,7 @@ Licensed under the terms of the `LICENSE` file in this repository.
 
 ## Known Bugs
 
-- When withdrawalHistory is written it writes in it's self, insted of overwriting.
+- Withdraw cookie consent button does not scale. It should like the cookie setting button
 
 ---
 
