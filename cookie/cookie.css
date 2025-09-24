@@ -1152,32 +1152,31 @@ body.cookie-blocked #cookie-block-overlay {
     position: fixed;
     bottom: var(--space-24);
     left: var(--space-24);
-    background: var(--color-secondary);
-    color: var(--color-text);
-    padding: var(--space-10) var(--space-16);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    z-index: 9998;
-    opacity: 0.9;
-    transition: all var(--duration-normal) var(--ease-standard);
-    box-shadow: var(--shadow-sm);
-    border: var(--space-1) solid var(--color-border);
+
+    /* visual: match .cookie-settings-link exactly */
+    background: var(--color-text-secondary) !important;
+    color: var(--color-surface) !important;
+    padding: var(--space-12) var(--space-16) !important;
+    border-radius: var(--radius-sm) !important;
+    text-decoration: none !important;
+    font-size: var(--font-size-sm) !important;
+    font-weight: var(--font-weight-medium) !important;
+    z-index: 9999 !important;
+    transition: all var(--duration-normal) var(--ease-standard) !important;
+    box-shadow: var(--shadow-sm) !important;
+    border: none !important;
+    opacity: 1 !important;
+
 }
 
-.cookie-withdrawal-link:hover {
-    background: var(--color-secondary-hover);
-    color: var(--color-text);
-    opacity: 1;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
+.cookie-withdrawal-link:hover,
 .cookie-withdrawal-link:focus {
-    outline: var(--focus-outline);
-    outline-offset: var(--space-2);
-    opacity: 1;
+    background: var(--color-text) !important;
+    color: var(--color-surface) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
+    outline: none;
+    opacity: 1 !important;
 }
 
 /* === MESSAGE NOTIFICATIONS === */
