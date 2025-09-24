@@ -4,9 +4,12 @@
 
 Lightweight, accessible, and privacy-first cookie consent banner. Blocks non-essential tracking by default, offers granular controls, and integrates with Google Tag Manager (GTM) while respecting user consent.
 
+[Demo Site](https://cookie.kschm.tech/)
+
 [![License](https://img.shields.io/github/license/KimSchm/Cookie.svg)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/KimSchm/Cookie.svg)](https://github.com/KimSchm/Cookie/commits/main)
 [![Issues](https://img.shields.io/github/issues/KimSchm/Cookie.svg)](https://github.com/KimSchm/Cookie/issues)
+
 
 </div>
 
