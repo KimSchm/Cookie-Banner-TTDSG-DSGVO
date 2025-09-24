@@ -16,7 +16,6 @@ class TTDSGCookieManager {
         document.querySelector('.cookie-container').hidden = false;
 
         // Setup withdrawal mechanisms
-        this.setupWithdrawalMechanisms();
     }
 
     /**
@@ -149,7 +148,7 @@ class TTDSGCookieManager {
     /**
      * Enhanced consent withdrawal mechanism
      */
-    withdrawConsent(categories = ['analytics', 'marketing']) {
+    withdrawConsent(categories = ['analytics', 'marketing', 'functional', 'social_media']) {
         if (!this.consentData) return;
         delete this.consentData.withdrawalHistory;
 
@@ -170,8 +169,6 @@ class TTDSGCookieManager {
         });
         newConsent.withdrawalHistory = withdrawalRecord;
         newConsent.lastModified = new Date().toISOString();
-        console.log('Withdrawing consent for categories:', categories);
-        console.log('New consent state:', newConsent);
         try {
             // TODO: Fix "cyclic object value" error for JSON.stringify
             const cleanedConsent = this.cleanCyclicData(newConsent);
@@ -245,6 +242,9 @@ class TTDSGCookieManager {
         const consent = this.consentData;
         if (!consent) return;
 
+        this.addWithdrawalLink();
+
+
         // Apply analytics consent
         if (consent.analytics) {
             this.enableAnalytics();
@@ -259,10 +259,24 @@ class TTDSGCookieManager {
             this.disableMarketing();
         }
 
+        if (consent.functional) {
+            this.enableFunctionalCookies();
+        } else {
+            this.disableFunctionalCookies();
+        }
+
+        if (consent.social_media) {
+            this.enableSocialMediaCookies();
+        } else {
+            this.disableSocialMediaCookies();
+        }
+
         // Log consent application
         this.logConsentEvent('consent_applied', {
             analytics: consent.analytics,
-            marketing: consent.marketing
+            marketing: consent.marketing,
+            functional: consent.functional,
+            social_media: consent.social_media
         });
     }
 
@@ -319,6 +333,29 @@ class TTDSGCookieManager {
         }
     }
 
+    /**
+     * Enable social media cookies
+     */
+    enableSocialMediaCookies() {
+    }
+
+    /**
+     * Disable social media cookies
+     */
+    disableSocialMediaCookies() {
+    }
+
+    /**
+     * Enable functional cookies
+     */
+    enableFunctionalCookies() {
+    }
+
+    /**
+     * Disable functional cookies
+     */
+    disableFunctionalCookies() {
+    }
     /**
      * Enhanced GTM loading with consent validation
      */
@@ -400,21 +437,19 @@ class TTDSGCookieManager {
 
 
     /**
-     * Setup withdrawal mechanisms
-     */
-    setupWithdrawalMechanisms() {
-        // Add withdrawal link if consent exists
-        if (this.consentData) {
-            this.addWithdrawalLink();
-        }
-    }
-
-    /**
      * Add withdrawal link to page
      */
     addWithdrawalLink() {
+        let categories = this.getCategoriesFromConsent();
+        let hasCategories = false;
+        for (let key in categories) {
+            if (categories[key]) hasCategories = true;
+        }
+        if (!hasCategories) {
+            document.querySelector('.cookie-withdrawal-link')?.remove();
+            return;
+        }
         const existingLink = document.querySelector('.cookie-withdrawal-link');
-        if (existingLink) return;
 
         const withdrawalLink = document.createElement('a');
         withdrawalLink.className = 'cookie-withdrawal-link';
@@ -443,7 +478,7 @@ class TTDSGCookieManager {
             transition: opacity 0.3s;
         `;
 
-        document.body.appendChild(withdrawalLink);
+        (existingLink) ? existingLink.replaceWith(withdrawalLink) : document.body.appendChild(withdrawalLink);
     }
 
     /**
@@ -453,6 +488,38 @@ class TTDSGCookieManager {
         const dialog = this.createWithdrawalDialog();
         document.body.appendChild(dialog);
         dialog.focus();
+    }
+
+    /**
+     * Get categories from current consent
+     */
+    getCategoriesFromConsent() {
+        return {
+            functional: this.consentData?.functional || false,
+            analytics: this.consentData?.analytics || false,
+            marketing: this.consentData?.marketing || false,
+            social_media: this.consentData?.social_media || false
+        };
+    }
+
+    /**
+     * Create withdrawal checkboxes
+     */
+    createWithdrawalCheckboxes() {
+        const container = document.createElement('div');
+        container.className = 'withdrawal-options';
+
+        for (const [category, isChecked] of Object.entries(this.getCategoriesFromConsent())) {
+            if (isChecked) {
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} id="withdraw-${category}"> ${category.slice(0, 1).toUpperCase() + category.replace('_', ' ').slice(1)} Cookies
+                `;
+                container.appendChild(label);
+            }
+        }
+
+        return container;
     }
 
     /**
@@ -470,14 +537,7 @@ class TTDSGCookieManager {
             <div class="withdrawal-content">
                 <h3 id="withdrawal-title">Withdraw Cookie Consent</h3>
                 <p>You can withdraw your consent for cookie categories at any time.</p>
-                <div class="withdrawal-options">
-                    <label>
-                        <input type="checkbox" checked id="withdraw-analytics"> Analytics Cookies
-                    </label>
-                    <label>
-                        <input type="checkbox" checked id="withdraw-marketing"> Marketing Cookies
-                    </label>
-                </div>
+                    ${this.createWithdrawalCheckboxes().outerHTML}
                 <div class="withdrawal-buttons">
                     <button onclick="this.parentNode.parentNode.parentNode.remove()" 
                             class="btn-cancel">Cancel</button>
@@ -500,6 +560,12 @@ class TTDSGCookieManager {
         }
         if (document.getElementById('withdraw-marketing')?.checked) {
             categories.push('marketing');
+        }
+        if (document.getElementById('withdraw-functional')?.checked) {
+            categories.push('functional');
+        }
+        if (document.getElementById('withdraw-social_media')?.checked) {
+            categories.push('social_media');
         }
 
         this.withdrawConsent(categories);
